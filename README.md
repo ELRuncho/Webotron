@@ -1,2 +1,2 @@
 # Webotron
-Python cli tool
+Python cli tool for deploying *static website* to s3 
