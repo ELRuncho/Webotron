@@ -8,4 +8,5 @@ Webotron currently has the following features:
 - List buckets
 - List Bucket contents
 - Create a bucket and set it up for Website use
+- sync local folder to s3 bucket
 
