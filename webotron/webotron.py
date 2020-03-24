@@ -1,6 +1,8 @@
 import boto3
 import click
 from botocore.exceptions import ClientError
+from pathlib import Path
+
 
 session= boto3.Session(profile_name='sandbox')
 s3 = session.resource('s3')
@@ -57,9 +59,11 @@ def setup_bucket(bucket):
     #url="http://%s.s3-website-us-east-1.amazonaws.com" % s3bucket.name
     return
 
-
-
-
+@cli.command('sync')
+@click.argument('pathname', type=click.Path(exists=True))
+def sync(patname):
+    "Syncs the contents of a given path to a Bucket"
+    pass
 
 if __name__ == "__main__":
     cli()
