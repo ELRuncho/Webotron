@@ -1,2 +1,11 @@
 # Webotron
-Python cli tool for deploying *static website* to s3 
+Webotron is a Python script that will sync a local folder to s3  and optionally configure Route53 and Cloudfront
+
+### Features
+
+Webotron currently has the following features:
+
+- List buckets
+- List Bucket contents
+- Create a bucket and set it up for Website use
+
