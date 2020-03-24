@@ -61,9 +61,18 @@ def setup_bucket(bucket):
 
 @cli.command('sync')
 @click.argument('pathname', type=click.Path(exists=True))
-def sync(patname):
-    "Syncs the contents of a given path to a Bucket"
-    pass
+def sync(pathname):
+    "Syncs the contents of a given path to a Bucket" 
+
+    root = Path(pathname).expanduser().resolve()
+
+    def handle_directory(target):
+        for p in target.iterdir():
+            if p.is_dir(): handle_directory(p)
+            if p.is_file(): print("path: {}\n Key: {}".format(p, p.relative_to(root)))
+
+    handle_directory(root)
+
 
 if __name__ == "__main__":
     cli()
