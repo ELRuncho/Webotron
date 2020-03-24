@@ -1,5 +1,7 @@
 import boto3
 import click
+from botocore.exceptions import ClientError
+
 session= boto3.Session(profile_name='sandbox')
 s3 = session.resource('s3')
 
@@ -25,10 +27,18 @@ def list_bucket_objects(bucket):
 @click.argument('bucket')
 def setup_bucket(bucket):
     "create and config s3 website"
-    s3bucket=s3.create_bucket(
-        Bucket=bucket
-        #CreateBucketConfiguration={'LocationConstraint'= session.region_name} 
-    )
+    try:
+        s3bucket=s3.create_bucket(
+            Bucket=bucket
+            #CreateBucketConfiguration={'LocationConstraint'= session.region_name} 
+        )
+    except ClientError as e:
+        if e.response['Error']['Code']=='BucketAlreadyExists':
+            print("Bucket Name already in use")
+        else:
+            raise e
+
+
     policy="""{
             "Version":"2012-10-17",
             "Statement":[{
