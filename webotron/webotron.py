@@ -6,9 +6,11 @@ from mimetypes import guess_type
 import boto3
 from botocore.exceptions import ClientError
 import click
+from bucket import BucketManager
 
 SESSION = boto3.Session(profile_name='sandbox')
-s3 = SESSION.resource('s3')
+bucket_manager = BucketManager(SESSION)
+#s3 = SESSION.resource('s3')
 
 
 def upload_file(s3bucket, path, key):
@@ -31,7 +33,7 @@ def cli():
 @cli.command('list-buckets')
 def list_buckets():
     """List buckets."""
-    for bucket in s3.buckets.all():
+    for bucket in bucket_manager.all_buckets():
         print(bucket)
 
 
@@ -39,7 +41,7 @@ def list_buckets():
 @click.argument('bucket')
 def list_bucket_objects(bucket):
     """List of objects on a specified S3 Bucket."""
-    for obj in s3.Bucket(bucket).objects.all():
+    for obj in bucket_manager.s3.Bucket(bucket).objects.all():
         print(obj)
 
 
@@ -48,7 +50,7 @@ def list_bucket_objects(bucket):
 def setup_bucket(bucket):
     """Create and config s3 website."""
     try:
-        s3bucket = s3.create_bucket(
+        s3bucket = bucket_manager.create_bucket(
             Bucket=bucket
             # CreateBucketConfiguration=
             # {'LocationConstraint'= SESSION.region_name}
@@ -87,7 +89,7 @@ def setup_bucket(bucket):
 @click.argument('bucket')
 def sync(pathname, bucket):
     """Sync the contents of a given path to a Bucket."""
-    s3bucket = s3.Bucket(bucket)
+    s3bucket = bucket_manager.Bucket(bucket)
     root = Path(pathname).expanduser().resolve()
 
     def handle_directory(target):
