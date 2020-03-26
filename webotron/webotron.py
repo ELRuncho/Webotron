@@ -2,10 +2,21 @@ import boto3
 import click
 from botocore.exceptions import ClientError
 from pathlib import Path
-
+from mimetypes import guess_type
 
 session= boto3.Session(profile_name='sandbox')
 s3 = session.resource('s3')
+
+def upload_file(s3bucket,path,key):
+    contentType=guess_type(key)[0] or 'text/html'
+    s3bucket.upload_file(
+        path,
+        key,
+        ExtraArgs={
+            'ContentType': contentType
+        }
+    )
+
 
 @click.group()
 def cli():
@@ -61,15 +72,16 @@ def setup_bucket(bucket):
 
 @cli.command('sync')
 @click.argument('pathname', type=click.Path(exists=True))
-def sync(pathname):
+@click.argument('bucket')
+def sync(pathname,bucket):
     "Syncs the contents of a given path to a Bucket" 
-
+    s3bucket=s3.Bucket(bucket)
     root = Path(pathname).expanduser().resolve()
 
     def handle_directory(target):
         for p in target.iterdir():
             if p.is_dir(): handle_directory(p)
-            if p.is_file(): print("path: {}\n Key: {}".format(p, p.relative_to(root)))
+            if p.is_file(): upload_file(s3bucket,str(p),str(p.relative_to(root)))
 
     handle_directory(root)
 
