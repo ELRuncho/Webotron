@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Webotron: Deploy websites to s3 buckets."""
 
 from pathlib import Path
