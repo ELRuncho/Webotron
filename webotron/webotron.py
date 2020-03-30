@@ -49,31 +49,9 @@ def list_bucket_objects(bucket):
 @click.argument('bucket')
 def setup_bucket(bucket):
     """Create and config s3 website."""
-    try:
-        s3bucket = bucket_manager.create_bucket(
-            Bucket=bucket
-            # CreateBucketConfiguration=
-            # {'LocationConstraint'= SESSION.region_name}
-        )
-    except ClientError as error:
-        if error.response['Error']['Code'] == 'BucketAlreadyExists':
-            print("Bucket Name already in use")
-        else:
-            raise error
-
-    policy = """{
-            "Version":"2012-10-17",
-            "Statement":[{
-            "Sid":"PublicReadObject",
-            "Effect":"Allow",
-            "Principal":"*",
-            "Action":["s3:GetObject"],
-            "Resource":["arn:aws:s3:::%s/*"]
-            }
-            ]
-        }""" % s3bucket.name
-    pol = s3bucket.Policy()
-    pol.put(Policy=policy)
+    bucket_manager.create_bucket(bucket)
+    bucket_manager.st_policy(bucket)
+    bucket_manager
     webconfig = s3bucket.Website()
     webconfig.put(
         WebsiteConfiguration={
